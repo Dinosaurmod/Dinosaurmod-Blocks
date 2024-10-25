@@ -67,7 +67,7 @@ Blockly.VariableCategory = function(workspace) {
     var firstVariable = variableModelList[0];
 
     Blockly.VariableCategory.addSetVariableTo(xmlList, firstVariable);
-    Blockly.VariableCategory.addBlock(xmlList, firstList, 'data_setvariableto', 'VARIABLE',
+    Blockly.VariableCategory.addBlock(xmlList, firstVariable, 'data_setvariableto', 'VARIABLE',
       ['VALUE', 'colour_picker', '']);
     Blockly.VariableCategory.addChangeVariableBy(xmlList, firstVariable);
     Blockly.VariableCategory.addShowVariable(xmlList, firstVariable);
