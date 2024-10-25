@@ -67,6 +67,8 @@ Blockly.VariableCategory = function(workspace) {
     var firstVariable = variableModelList[0];
 
     Blockly.VariableCategory.addSetVariableTo(xmlList, firstVariable);
+    Blockly.VariableCategory.addBlock(xmlList, firstList, 'data_setvariableto', 'VARIABLE',
+      ['VALUE', 'colour_picker', '']);
     Blockly.VariableCategory.addChangeVariableBy(xmlList, firstVariable);
     Blockly.VariableCategory.addShowVariable(xmlList, firstVariable);
     Blockly.VariableCategory.addHideVariable(xmlList, firstVariable);
@@ -104,11 +106,15 @@ Blockly.VariableCategory.ListCategory = function(workspace) {
     Blockly.VariableCategory.addSep(xmlList);
     Blockly.VariableCategory.addDeleteOfList(xmlList, firstList);
     Blockly.VariableCategory.addDeleteAllOfList(xmlList, firstList);
+    Blockly.VariableCategory.addBlock(xmlList, firstList, 'data_shiftlist', 'LIST',
+        ['INDEX', 'math_integer', 1]);
     Blockly.VariableCategory.addInsertAtList(xmlList, firstList);
     Blockly.VariableCategory.addReplaceItemOfList(xmlList, firstList);
     Blockly.VariableCategory.addBlock(xmlList, firstList, 'data_listforeachitem', 'LIST');
     Blockly.VariableCategory.addBlock(xmlList, firstList, 'data_listforeachnum', 'LIST');
     Blockly.VariableCategory.addSep(xmlList);
+    Blockly.VariableCategory.addBlock(xmlList, firstList, 'data_amountinlist',
+        'LIST', ['VALUE', 'text', "foo"]);
     Blockly.VariableCategory.addItemOfList(xmlList, firstList);
     Blockly.VariableCategory.addItemNumberOfList(xmlList, firstList);
     Blockly.VariableCategory.addLengthOfList(xmlList, firstList);

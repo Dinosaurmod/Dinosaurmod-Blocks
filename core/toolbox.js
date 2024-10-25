@@ -85,10 +85,15 @@ Blockly.Toolbox = function(workspace) {
 
 };
 
-Blockly.Toolbox.menus_ = {}
-Blockly.Toolbox.registerMenu = function(name, options) {
-  Blockly.Toolbox.menus_[name] = options
-}
+Blockly.Toolbox.menus_ = {};
+Blockly.Toolbox.registerMenu = function(name, options, opt_merge) {
+  if (Blockly.Toolbox.menus_[name] && opt_merge) {
+    console.warn('registerMenu concats existing options together! if your intent was to override a menu you cant do that via existing functions.')
+    Blockly.Toolbox.menus_[name] = Blockly.Toolbox.menus_[name].concat(options)
+    return;
+  }
+  Blockly.Toolbox.menus_[name] = options;
+};
 
 /**
  * Width of the toolbox, which changes only in vertical layout.
@@ -691,15 +696,12 @@ Blockly.Toolbox.Category = function(parent, parentHtml, domTree) {
   if (options) {
     // wrap all the callbacks so they know who is calling
     this.menuOptions_ = []
+    var self = this
     for (var i = 0; i < options.length; i++) {
-      var callback = options[i].callback
-      var self = this
       this.menuOptions_.push({
         text: options[i].text,
         enabled: options[i].enabled,
-        callback: function() {
-          callback(self.id_)
-        }
+        callback: options[i].callback.bind(null, self.id_)
       })
     }
   }
@@ -763,7 +765,7 @@ Blockly.Toolbox.Category.prototype.createDom = function() {
     var tbIcon = goog.dom.createDom('img',
         {
           'class': 'tbBubbleIcon',
-          'src': 'https://turbobuilder-steel.vercel.app/favicon.png',
+          'src': 'https://dev-turbobuilder.vercel.app/logos/full.svg',
           'style': 'display: none;'
         })
     this.bubble_.appendChild(tbIcon)
