@@ -231,6 +231,10 @@
       mutationRoot.addStringNumberExternal();
     }
 
+    function addNumber() {
+      mutationRoot.addNumberExternal();
+    }
+
     function setOutput(type) {
       mutationRoot.setReturns(true);
       mutationRoot.setType(type);
@@ -243,6 +247,10 @@
 
     function addTextNumber() {
       mutationRoot.addStringNumberExternal();
+    }
+
+    function addNumber() {
+      mutationRoot.addNumberExternal();
     }
 
     function changeIcon() {
@@ -279,7 +287,7 @@
     }
 
     function addRandomInput() {
-      var rnd = Math.floor(Math.random() * 3);
+      var rnd = Math.floor(Math.random() * 4);
       switch (rnd) {
         case 0:
           addTextNumber();
@@ -289,6 +297,9 @@
           break;
         case 2:
           addBoolean();
+          break;
+        case 3:
+          addNumber();
           break;
       }
     }

@@ -794,6 +794,21 @@ Blockly.ScratchBlocks.ProcedureUtils.addStringNumberExternal = function() {
 };
 
 /**
+ * Externally-visible function to add a string/number argument to the procedure
+ * declaration.
+ * @public
+ */
+Blockly.ScratchBlocks.ProcedureUtils.addNumberExternal = function() {
+  Blockly.WidgetDiv.hide(true);
+  this.procCode_ = this.procCode_ + ' %n';
+  this.displayNames_.push('number');
+  this.argumentIds_.push(Blockly.utils.genUid());
+  this.argumentDefaults_.push('');
+  this.updateDisplay_();
+  this.focusLastEditor_();
+};
+
+/**
  * Externally-visible function to get the warp on procedure declaration.
  * @return {boolean} The value of the warp_ property.
  * @public
@@ -1155,6 +1170,7 @@ Blockly.Blocks['procedures_declaration'] = {
   addBooleanExternal: Blockly.ScratchBlocks.ProcedureUtils.addBooleanExternal,
   addCommandExternal: Blockly.ScratchBlocks.ProcedureUtils.addCommandExternal,
   addStringNumberExternal: Blockly.ScratchBlocks.ProcedureUtils.addStringNumberExternal,
+  addNumberExternal: Blockly.ScratchBlocks.ProcedureUtils.addNumberExternal,
   onChangeFn: Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_
 };
 
