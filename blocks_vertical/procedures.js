@@ -663,6 +663,8 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentEditor_ = function(
   try {
     switch (argumentType) {
       case 'n':
+        var newBlock = this.workspace.newBlock('argument_editor_number');
+        break;
       case 's':
         var newBlock = this.workspace.newBlock('argument_editor_string_number');
         break;
@@ -710,6 +712,9 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function() {
       switch (target.type) {
         case 'argument_editor_string_number':
           this.procCode_ += '%s';
+          break;
+        case 'argument_editor_number':
+          this.procCode_ += '%n';
           break;
         case 'argument_editor_boolean':
           this.procCode_ += '%b';
@@ -1265,6 +1270,25 @@ Blockly.Blocks['argument_editor_string_number'] = {
       "colourSecondary": Blockly.Colours.textField,
       "colourTertiary": Blockly.Colours.textField,
       "extensions": ["output_number", "output_string"]
+    });
+  },
+  // Exist on declaration and arguments editors, with different implementations.
+  removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_
+};
+
+Blockly.Blocks['argument_editor_number'] = {
+  init: function() {
+    this.jsonInit({ "message0": " %1",
+      "args0": [
+        {
+          "type": "field_input_removable",
+          "name": "TEXT",
+        }
+      ],
+      "colour": Blockly.Colours.textField,
+      "colourSecondary": Blockly.Colours.textField,
+      "colourTertiary": Blockly.Colours.textField,
+      "extensions": ["output_number"]
     });
   },
   // Exist on declaration and arguments editors, with different implementations.
