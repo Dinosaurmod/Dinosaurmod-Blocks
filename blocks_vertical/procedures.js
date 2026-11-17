@@ -316,7 +316,7 @@ Blockly.ScratchBlocks.ProcedureUtils.createIcon_ = function() {
 Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) {
   this.createIcon_()
   // Split the proc into components, by %n, %b, and %s (ignoring escaped).
-  var procComponents = this.procCode_.split(/(?=[^\\]%[nsbc])/);
+  var procComponents = this.procCode_.split(/(?=[^\\]%[nsbcm])/);
   procComponents = procComponents.map(function(c) {
     return c.trim(); // Strip whitespace.
   });
@@ -327,7 +327,7 @@ Blockly.ScratchBlocks.ProcedureUtils.createAllInputs_ = function(connectionMap) 
     var argumentType = component.substring(1, 2);
     var id = this.argumentIds_[argumentCount];
     // user error shouldnt literally nuke the app, ignore invalid markers instead of erroring on them
-    if (component.substring(0, 1) == '%' && (['n', 's', 'b', 'c'].includes(argumentType)) && id) {
+    if (component.substring(0, 1) == '%' && (['n', 's', 'b', 'c', 'm'].includes(argumentType)) && id) {
       /*
       if (!(argumentType == 'n' || argumentType == 'b' || argumentType == 's')) {
         throw new Error(
@@ -469,10 +469,10 @@ Blockly.ScratchBlocks.ProcedureUtils.buildShadowDom_ = function(type) {
  * @this Blockly.Block
  */
 Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function(input, argumentType) {
-  var validArgs = ['n', 's'];
+  var validArgs = ['n', 's', 'm'];
   if (!Blockly.Procedures.ADDON_SP_CHECKBOXES_DISABLED) validArgs.push('b');
   if (validArgs.includes(argumentType)) {
-    var blockType = {'n': 'math_number', 's': 'text', 'b': 'checkbox'}[argumentType];
+    var blockType = {'n': 'math_number', 's': 'text', 'b': 'checkbox', 'm': 'colour_picker'}[argumentType];
     Blockly.Events.disable();
     try {
       var newBlock = this.workspace.newBlock(blockType);
@@ -485,6 +485,9 @@ Blockly.ScratchBlocks.ProcedureUtils.attachShadow_ = function(input, argumentTyp
           break;
         case 'b':
           newBlock.setFieldValue('false', 'CHECKBOX');
+          break;
+        case 'm':
+          newBlock.setFieldValue('#ff0000', 'COLOR');
           break;
       }
       newBlock.setShadow(true);
@@ -526,6 +529,9 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentReporter_ = function(
           break;
         case 'c':
           var blockType = 'argument_reporter_command';
+          break;
+        case 'm':
+          var blockType = 'argument_reporter_color';
           break;
   }
   Blockly.Events.disable();
@@ -713,6 +719,9 @@ Blockly.ScratchBlocks.ProcedureUtils.checkOldTypeMatches_ = function(oldBlock,
   if (type == 'c' && oldBlock.type == 'argument_reporter_command') {
     return true;
   }
+  if (type == 'm' && oldBlock.type == 'argument_reporter_color') {
+    return true;
+  }
   return false;
 };
 
@@ -741,6 +750,9 @@ Blockly.ScratchBlocks.ProcedureUtils.createArgumentEditor_ = function(
         break;
       case 'b':
         var newBlock = this.workspace.newBlock('argument_editor_boolean');
+        break;
+      case 'm':
+        var newBlock = this.workspace.newBlock('argument_editor_color');
         break;
       case 'c':
         var newBlock = this.workspace.newBlock('argument_editor_command')
@@ -790,6 +802,9 @@ Blockly.ScratchBlocks.ProcedureUtils.updateDeclarationProcCode_ = function() {
           break;
         case 'argument_editor_boolean':
           this.procCode_ += '%b';
+          break;
+        case 'argument_editor_color':
+          this.procCode_ += '%m';
           break;
         case 'argument_editor_command':
           this.procCode_ += "%c";
@@ -1040,6 +1055,7 @@ Blockly.ScratchBlocks.ProcedureUtils.updateArgumentReporterNames_ = function(pre
     if ((
         block.type === 'argument_reporter_string_number' ||
         block.type === 'argument_reporter_number' ||
+        block.type === 'argument_reporter_color' ||
         block.type === 'argument_reporter_boolean' ||
         block.type === 'argument_reporter_command') &&
         !block.isShadow()) { // Exclude arg reporters in the prototype block, which are shadows.
@@ -1337,6 +1353,49 @@ Blockly.Blocks['argument_reporter_boolean'] = {
   domToMutation: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterDomToMutation
 };
 
+Blockly.Blocks['argument_reporter_number'] = {
+  init: function() {
+    this.jsonInit({ 
+      "message0": " %1",
+      "args0": [
+        {
+          "type": "field_label_serializable",
+          "name": "VALUE",
+          "text": ""
+        }
+      ],
+      "extensions": ["colours_more", "output_any"]
+    });
+  },
+  updateDisplay_: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterUpdateDisplay,
+  mutationToDom: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterMutationToDom,
+  domToMutation: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterDomToMutation
+};
+
+Blockly.Blocks['argument_reporter_color'] = {
+  /**
+   * dinosaurmod: a thing that could be added to dinosaurmod.
+   * this is NOT compatible with PenguinMod.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({ 
+      "message0": " %1",
+      "args0": [
+        {
+          "type": "field_label_serializable",
+          "name": "VALUE",
+          "text": ""
+        }
+      ],
+      "extensions": ["colours_more", "output_any"]
+    });
+  },
+  updateDisplay_: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterUpdateDisplay,
+  mutationToDom: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterMutationToDom,
+  domToMutation: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterDomToMutation
+};
+
 Blockly.Blocks['argument_reporter_string_number'] = {
   init: function() {
     this.jsonInit({ 
@@ -1374,7 +1433,7 @@ Blockly.Blocks['argument_reporter_command'] = {
   mutationToDom: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterMutationToDom,
   domToMutation: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterDomToMutation
 };
-
+/*
 Blockly.Blocks['argument_reporter_color_picker'] = {
   init: function() {
     this.jsonInit({ 
@@ -1394,7 +1453,7 @@ Blockly.Blocks['argument_reporter_color_picker'] = {
   mutationToDom: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterMutationToDom,
   domToMutation: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterDomToMutation
 };
-
+*/
 Blockly.Blocks['argument_reporter_empty'] = {
   init: function() {
     this.jsonInit({ 
@@ -1408,25 +1467,6 @@ Blockly.Blocks['argument_reporter_empty'] = {
       ],
       "output": "colour",
       "extensions": ["colours_more"]
-    });
-  },
-  updateDisplay_: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterUpdateDisplay,
-  mutationToDom: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterMutationToDom,
-  domToMutation: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterDomToMutation
-};
-
-Blockly.Blocks['argument_reporter_command'] = {
-  init: function () {
-    this.jsonInit({ "message0": " %1",
-      "args0": [
-        {
-          "type": "field_label_serializable",
-          "name": "VALUE",
-          "text": ""
-        }
-      ],
-      "canDragDuplicate": true,
-      "extensions": ["colours_more", "shape_statement"],
     });
   },
   updateDisplay_: Blockly.ScratchBlocks.ProcedureUtils.argumentReporterUpdateDisplay,
@@ -1475,18 +1515,49 @@ Blockly.Blocks['argument_editor_string_number'] = {
 };
 
 Blockly.Blocks['argument_editor_number'] = {
+  /**
+   * dinosaurmod: a thing that could be added to dinosaurmod.
+   * this is NOT compatible with PenguinMod.
+   * @this Blockly.Block
+   */
   init: function() {
     this.jsonInit({ "message0": " %1",
       "args0": [
         {
           "type": "field_input_removable",
           "name": "TEXT",
+          "text": "0"
         }
       ],
       "colour": Blockly.Colours.textField,
       "colourSecondary": Blockly.Colours.textField,
       "colourTertiary": Blockly.Colours.textField,
       "extensions": ["output_number"]
+    });
+  },
+  // Exist on declaration and arguments editors, with different implementations.
+  removeFieldCallback: Blockly.ScratchBlocks.ProcedureUtils.removeArgumentCallback_
+};
+
+Blockly.Blocks['argument_editor_color'] = {
+  /**
+   * dinosaurmod: a thing that could be added to dinosaurmod.
+   * this is NOT compatible with PenguinMod.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({ "message0": " %1",
+      "args0": [
+        {
+          "type": "field_input_removable",
+          "name": "TEXT",
+          "text": "#ff0000"
+        }
+      ],
+      "colour": Blockly.Colours.textField,
+      "colourSecondary": Blockly.Colours.textField,
+      "colourTertiary": Blockly.Colours.textField,
+      "extensions": ["output_number", "output_string"]
     });
   },
   // Exist on declaration and arguments editors, with different implementations.
